@@ -25,7 +25,7 @@ plotsquared-core = { group = "com.intellectualsites.plotsquared", name = "plotsq
 reflection-remapper = { group = "xyz.jpenilla", name = "reflection-remapper", version.ref = "reflection-remapper" }
 viaversion-api = { group = "com.viaversion", name = "viaversion-api", version.ref = "viaversion-api" }
 worldguard-bukkit = { group = "com.sk89q.worldguard", name = "worldguard-bukkit", version.ref = "worldguard-bukkit" }
-zstd-jni = { group = "com.github.luben", name = "zstd-jni", version = "1.5.5-4" }
+zstd-jni = { group = "com.github.luben", name = "zstd-jni", version = "1.5.7-1" }
 griefdefender = { group = "com.griefdefender", name = "api", version.ref = "griefdefender" }
 
 [plugins]

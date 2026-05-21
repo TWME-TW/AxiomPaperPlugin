@@ -1,5 +1,6 @@
 plugins {
     `java-library`
+    `maven-publish`
     alias(libs.plugins.paperweight.userdev)
     alias(libs.plugins.run.paper) // Adds runServer and runMojangMappedServer tasks for testing
 
@@ -37,6 +38,48 @@ repositories {
     mavenCentral()
 }
 
+publishing {
+    repositories {
+        maven {
+            name = "twme-repo-snapshots"
+            url = uri("https://repo.twme.dev/snapshots")
+            credentials {
+                username = System.getenv("TWME_REPO_USERNAME")
+                password = System.getenv("TWME_REPO_PASSWORD")
+            }
+        }
+    }
+
+    publications {
+        create<MavenPublication>("shadow") {
+            groupId = project.group.toString()
+            artifactId = project.name
+            version = project.version.toString()
+
+            from(components["shadow"])
+
+            pom {
+                name = project.name
+                description = project.description
+                url = "https://github.com/Moulberry/AxiomPaperPlugin"
+
+                licenses {
+                    license {
+                        name = "MIT"
+                        url = "https://opensource.org/licenses/MIT"
+                    }
+                }
+
+                scm {
+                    connection = "scm:git:https://github.com/Moulberry/AxiomPaperPlugin.git"
+                    developerConnection = "scm:git:https://github.com/Moulberry/AxiomPaperPlugin.git"
+                    url = "https://github.com/Moulberry/AxiomPaperPlugin"
+                }
+            }
+        }
+    }
+}
+
 dependencies {
     paperweight.paperDevBundle("26.1.1.build.29-alpha")
 
@@ -62,6 +105,10 @@ dependencies {
 }
 
 tasks {
+    shadowJar {
+        archiveClassifier.set("")
+    }
+
     assemble {
         dependsOn(shadowJar)
     }

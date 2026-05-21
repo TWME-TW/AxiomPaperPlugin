@@ -1,5 +1,6 @@
 plugins {
     `java-library`
+    `maven-publish`
     alias(libs.plugins.paperweight.userdev)
     alias(libs.plugins.run.paper) // Adds runServer and runMojangMappedServer tasks for testing
 
@@ -38,6 +39,48 @@ repositories {
     mavenCentral()
 }
 
+publishing {
+    repositories {
+        maven {
+            name = "twme-repo-snapshots"
+            url = uri("https://repo.twme.dev/snapshots")
+            credentials {
+                username = System.getenv("TWME_REPO_USERNAME")
+                password = System.getenv("TWME_REPO_PASSWORD")
+            }
+        }
+    }
+
+    publications {
+        create<MavenPublication>("shadow") {
+            groupId = project.group.toString()
+            artifactId = project.name
+            version = project.version.toString()
+
+            from(components["shadow"])
+
+            pom {
+                name = project.name
+                description = project.description
+                url = "https://github.com/Moulberry/AxiomPaperPlugin"
+
+                licenses {
+                    license {
+                        name = "MIT"
+                        url = "https://opensource.org/licenses/MIT"
+                    }
+                }
+
+                scm {
+                    connection = "scm:git:https://github.com/Moulberry/AxiomPaperPlugin.git"
+                    developerConnection = "scm:git:https://github.com/Moulberry/AxiomPaperPlugin.git"
+                    url = "https://github.com/Moulberry/AxiomPaperPlugin"
+                }
+            }
+        }
+    }
+}
+
 dependencies {
     paperweight.paperDevBundle("1.21.11-R0.1-SNAPSHOT")
     implementation(libs.reflection.remapper)
@@ -65,6 +108,13 @@ dependencies {
 }
 
 tasks {
+    shadowJar {
+        archiveClassifier.set("")
+        // helper function to relocate a package into our package
+        fun reloc(pkg: String) = relocate(pkg, "com.moulberry.axiom.dependency.$pkg")
+        reloc("xyz.jpenilla:reflection-remapper")
+    }
+
     assemble {
         dependsOn(shadowJar)
     }
@@ -90,11 +140,5 @@ tasks {
         filesMatching("plugin.yml") {
             expand(props)
         }
-    }
-
-    shadowJar {
-        // helper function to relocate a package into our package
-        fun reloc(pkg: String) = relocate(pkg, "com.moulberry.axiom.dependency.$pkg")
-        reloc("xyz.jpenilla:reflection-remapper")
     }
 }
